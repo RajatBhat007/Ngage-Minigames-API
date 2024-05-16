@@ -5,6 +5,7 @@ const axios = require('axios');
 
 const mysql = require("mysql2");
 const fs=require("fs")
+//const https=require("https")
 const https=require("https")
 const app = express();
 const port = 2000;
@@ -16,145 +17,73 @@ app.use(cors());
 
 
 
-// Create a MySQL database connection
-// const db = mysql.createConnection({
-//   host: "13.127.109.239",
-//   user: "TgcRajatP2L",
-//   password: "Rajat@P2Lcub",
-//   //database: "pypdb",
-//   database: "db_new_ngage",
-// });
+
+
 
 // Create a MySQL database connection
-const db = mysql.createConnection({
-    host: "13.127.109.239",
+const db = mysql.createPool({
+   // host: "13.127.109.239",
+   // host: "13.201.246.207", //pro
+   host: "43.205.164.14",
     user: "TgcRajatP2L",
     password: "Rajat@P2Lcub",
     //database: "pypdb",
-   database: "db_new_ngage",
+  // database: "db_new_ngage"
+   database: "db_new_ngage_beta",
   });
+
+ 
   
 
   
-const db2 = mysql.createConnection({
-    host: "13.127.109.239",
+const db2 = mysql.createPool({
+  //  host: "13.201.246.207", //pro
+   host: "43.205.164.14",
     user: "TgcRajatP2L",
     password: "Rajat@P2Lcub",
-    database: "db_tgc_game_pro", // Database 2
+    //database: "db_tgc_game_pro", // Database 2
+  database: "db_new_ngage_beta",
   });
 
 
-  db.connect((err) => {
-    if (err) {
-      console.error('Error connecting to MySQL database:', err);
-      return;
-    }
-    console.log('Connected to MySQL database');
-  });
+db.getConnection((err, connection) => {
+  if (err) {
+    console.error('Error connecting to MySQL database:', err);
+    return;
+  }
+  console.log('Connected to MySQL database');
+  db.releaseConnection(connection);
+});
 
-  db2.connect((err) => {
-    if (err) {
-      console.error('Error connecting to MySQL database1:', err);
-      return;
-    }
-    console.log('Connected to MySQL database1');
-  });
+db2.getConnection((err, connection) => {
+  if (err) {
+    console.error('Error connecting to MySQL database:', err);
+    return;
+  }
+  console.log('Connected to MySQL database');
+  db2.releaseConnection(connection);
+});
 
-
-// const httpsOptions = {
-//   key: fs.readFileSync('D:\\Playtolearn.in_ssl\\playtolearn_certificate.pem'),
-//   cert: fs.readFileSync('D:\\Playtolearn.in_ssl\\Playtolearn_ssl_CRT.crt'),
-// }
-
-// app.post('/api/users', (req, res) => {
-//   const { org_id, name, email, phone_number, password, city } = req.body;
-//   const query = `INSERT INTO tbl_temp_User (org_id, name, email, phone_number, password, city, updated_datetime) VALUES (?, ?, ?, ?, ?, ?, NOW())`;
-//   db.query(query, [org_id, name, email, phone_number, password, city], (err, result) => {
-//     if (err) {
-//       console.error('Error inserting user:', err);
-//       res.status(500).json({ error: 'Failed to insert user' });
-//       return;
-//     }
-//     console.log('User inserted successfully');
-//     res.status(200).json({ message: 'User inserted successfully' });
-//   });
-// });
+//const httpsOptions = {
+  //key: fs.readFileSync('D:\\Playtolearn.in_ssl\\playtolearn_certificate.pem'),
+  //cert: fs.readFileSync('D:\\Playtolearn.in_ssl\\Playtolearn_ssl_CRT.crt'),
+//}
 
 
-// app.post('/api/users', (req, res) => {
-//   const { org_id, name, email,phone_number, password, city } = req.body;
 
-//   // Insert into tbl_temp_User in db1
-//   const queryTempUser = `INSERT INTO tbl_temp_User (org_id, name, email,phone_number, password, city, updated_datetime) VALUES (?, ?, ?, ?, ?, ?,NOW())`;
-//   db.query(queryTempUser, [org_id, name, email,phone_number, password, city], (err, result) => {
-//     if (err) {
-//       console.error('Error inserting user into tbl_temp_User:', err);
-//       res.status(500).json({ error: 'Failed to insert user into tbl_temp_User' });
-//       return;
-//     }
-//     console.log('User inserted successfully into tbl_temp_User');
+ const httpsOptions = {
+   key: fs.readFileSync('/opt/bitnami/letsencrypt/certificates/n-gage.co.in.key'),
+   cert: fs.readFileSync('/opt/bitnami/letsencrypt/certificates/n-gage.co.in.crt'),
 
-//     // Get the inserted user's ID
-//     const userId = result.insertId;
-
-//     // Insert into tbl_users in db2
-//     const queryUsers = `
-//       INSERT INTO db_tgc_game_beta.tbl_users (Name, Email, Phone_No, Password, ID_ORGANIZATION, login_type)
-//       VALUES (?, ?, ?, ?, ?, 1)
-//     `;
-//     db2.query(queryUsers, [name, email, null, password, org_id], (usersErr, usersResult) => {
-//       if (usersErr) {
-//         console.error('Error inserting user into tbl_users:', usersErr);
-//         res.status(500).json({ error: 'Failed to insert user into tbl_users' });
-//         return;
-//       }
-//       console.log(usersResult);
-//       console.log('User inserted successfully into tbl_users in db2');
-//       res.status(200).json({ message: 'User inserted successfully' });
-//     });
-//   });
-// });
+ };
 
 
-// app.post('/api/signup', (req, res) => {
-//   const { org_id, name, email, password, phone_number, city } = req.body;
-  
-//   // Check if the email or phone number already exists in the database
-//   const checkQuery = `SELECT COUNT(*) AS count FROM tbl_temp_User WHERE email = ? OR phone_number = ?`;
-//   db.query(checkQuery, [email, phone_number], (err, result) => {
-//     if (err) {
-//       console.error('Error checking for existing user:', err);
-//       res.status(500).json({ error: 'Failed to check for existing user' });
-//       return;
-//     }
-    
-//     const existingUserCount = result[0].count;
-    
-//     if (existingUserCount > 0) {
-//       // User with the same email or phone number already exists
-//       res.status(400).json({ error: 'User with the same email or phone number already exists' });
-//       return;
-//     }
-    
-//     // No existing user found, proceed with insertion
-//     const insertQuery = `INSERT INTO tbl_temp_User (org_id, name, email, password, phone_number, city, updated_datetime) VALUES (?, ?, ?, ?, ?, ?, NOW())`;
-//     db.query(insertQuery, [org_id, name, email, password, phone_number, city], (err, result) => {
-//       if (err) {
-//         console.error('Error inserting user:', err);
-//         res.status(500).json({ error: 'Failed to insert user' });
-//         return;
-//       }
-//       console.log('User inserted successfully');
-//       res.status(200).json({ message: 'User inserted successfully' });
-//     });
-//   });
-// });
 
 app.post('/api/signup', (req, res) => {
-  const { org_id, name, email, password, phone_number, city } = req.body;
+  const { org_id, name, email, password, phone_number, city ,isActive} = req.body;
   
   // Check if a user with the same org_id, email, and phone_number already exists in the database
-  const checkQuery = `SELECT COUNT(*) AS count FROM tbl_temp_User WHERE org_id = ? AND (email = ? OR phone_number = ?)`;
+  const checkQuery = `SELECT COUNT(*) AS count FROM tbl_temp_user WHERE org_id = ? AND (email = ? OR phone_number = ?)`;
   db.query(checkQuery, [org_id, email, phone_number], (err, result) => {
     if (err) {
       console.error('Error checking for existing user:', err);
@@ -171,8 +100,8 @@ app.post('/api/signup', (req, res) => {
     }
     
     // No existing user found, proceed with insertion
-    const insertQuery = `INSERT INTO tbl_temp_User (org_id, name, email, password, phone_number, city, updated_datetime) VALUES (?, ?, ?, ?, ?, ?, NOW())`;
-    db.query(insertQuery, [org_id, name, email, password, phone_number, city], (err, result) => {
+    const insertQuery = `INSERT INTO tbl_temp_user (org_id, name, email, password, phone_number, city, updated_datetime,isActive) VALUES (?, ?, ?, ?, ?, ?, NOW(),'A')`;
+    db.query(insertQuery, [org_id, name, email, password, phone_number, city,isActive], (err, result) => {
       if (err) {
         console.error('Error inserting user:', err);
         res.status(500).json({ error: 'Failed to insert user' });
@@ -185,18 +114,19 @@ app.post('/api/signup', (req, res) => {
 });
 
 app.post("/api/login", (req, res) => {
-  const { org_id, email, password } = req.body;
+  const { org_id, email, password ,isActive} = req.body;
 
   // Construct the SQL query to check if the user exists
   const query = `
-    SELECT * FROM tbl_temp_User WHERE org_id = ? AND Email = ? AND Password = ?
+    SELECT * FROM tbl_temp_user WHERE org_id = ? AND Email = ? AND Password = ? AND isActive ='A'
   `;
 
   // Execute the SQL query with org_id, email, and password as parameters
   db.query(
     query,
-    [org_id, email, password],
+    [org_id, email, password,isActive],
     (err, result) => {
+      
       if (err) {
         console.error("Error during login:", err);
         res.status(500).json({ error: "Internal server error" });
@@ -208,6 +138,7 @@ app.post("/api/login", (req, res) => {
         // User exists, return success response
         res.status(200).json({ message: "Login successful", user: result[0] });
       } else {
+       
         // No matching user found, return error response
         res.status(401).json({ error: "Invalid org_id, email, or password" });
       }
@@ -215,77 +146,6 @@ app.post("/api/login", (req, res) => {
   );
 });
 
-// app.post("/api/login", (req, res) => {
-//   const { email, password } = req.body;
-
-//   // Construct the SQL query to check if the user exists
-//   const query = `
-//     SELECT * FROM tbl_temp_User WHERE Email = ? AND Password = ?
-//   `;
-
-//   // Execute the SQL query with email and password as parameters
-//   db.query(
-//     query,
-//     [email, password],
-//     (err, result) => {
-//       if (err) {
-//         console.error("Error during login:", err);
-//         res.status(500).json({ error: "Internal server error" });
-//         return;
-//       }
-      
-//       // Check if any rows were returned (indicating a matching user)
-//       if (result.length > 0) {
-//         // User exists, return success response
-//         res.status(200).json({ message: "Login successful", user: result[0] });
-//       } else {
-//         // No matching user found, return error response
-//         res.status(401).json({ error: "Invalid email or password" });
-//       }
-//     }
-//   );
-// });
-
-
-// app.post("/api/registration", (req, res) => {
-//   const { Name, Email, Phone_No, Password, Organization_Name, IsActive, ID_ORGANIZATION, login_type, Id_CmsUser } = req.body;
-
-//   // Construct the SQL INSERT query
-//   const query = `
-//     INSERT INTO tbl_users (Name, Email, Phone_No, Password, Organization_Name, IsActive, Updated_Date_Time, ID_ORGANIZATION, login_type, Id_CmsUser)
-//     VALUES (?, ?, ?, ?, ?, ?, NOW(), ?, ?, ?)
-//   `;
-
-//   // Execute the SQL query with the user data as parameters
-//   db2.query(
-//     query,
-//     [Name, Email, Phone_No, Password, Organization_Name, IsActive, ID_ORGANIZATION, login_type, Id_CmsUser],
-//     (err, result) => {
-//       if (err) {
-//         console.error("Error inserting user:", err);
-//         res.status(500).json({ error: "Failed to insert user" });
-//         return;
-//       }
-//       console.log("User inserted successfully");
-//       res.status(200).json({ message: "User inserted successfully" });
-//     }
-//   );
-// });
-
-
-// app.get('/api/game_user_logs/:Id_Game', (req, res) => {
-//   const { Id_Game } = req.params;
-
-//   const query = `SELECT * FROM tbl_game_user_log WHERE Id_Game = ? ORDER BY score DESC`;
-//   db2.query(query, [Id_Game], (err, result) => {
-//     if (err) {
-//       console.error('Error retrieving game user logs:', err);
-//       res.status(500).json({ error: 'Failed to retrieve game user logs' });
-//       return;
-//     }
-//     res.status(200).json({ game_user_logs: result });
-//   });
-// });
 
 app.post("/api/games", (req, res) => {
   const { id_game, org_id, front_image, back_image, game_name,game_url, enable_status } = req.body;
@@ -472,129 +332,6 @@ app.post("/api/updatePassword", (req, res) => {
 
 
 
-// app.post('/api/autoAssignAssessment', (req, res) => {
-//   const { Id_User,Email, Id_Assessment, ID_ORGANIZATION, IsActive } = req.body;
-
-//   // Construct the SQL INSERT query
-//   const query = `
-//     INSERT INTO tbl_question_user_log (Id_User, Email,Id_Assessment, ID_ORGANIZATION, IsActive, UPDATED_DATE_TIME)
-//     VALUES (?, ?, ?, ?, ?, NOW())
-//   `;
-
-//   // Execute the SQL query with the data from the request body as parameters
-//   db2.query(
-//     query,
-//     [Id_User,Email, Id_Assessment, ID_ORGANIZATION, IsActive],
-//     (err, result) => {
-//       if (err) {
-//         console.error('Error inserting data into tbl_question_user_log:', err);
-//         res.status(500).json({ error: 'Failed to insert data into tbl_question_user_log' });
-//         return;
-//       }
-//       console.log('Data inserted successfully into tbl_question_user_log');
-//       res.status(200).json({ message: 'Data inserted successfully into tbl_question_user_log' });
-//     }
-//   );
-// });
-
-
-// app.get('/api/gameLeaderboard', (req, res) => {
-//   const { id_user, Id_Game, status, ID_ORGANIZATION } = req.query;
-
-//   // Construct the SQL SELECT query to retrieve scores and rank
-//   const query = `
-//     SELECT *, 
-//            FIND_IN_SET(score, (SELECT GROUP_CONCAT(score ORDER BY score DESC) FROM tbl_game_user_log WHERE Id_Game = ? AND status = ? AND ID_ORGANIZATION = ?)) AS ranking
-//     FROM tbl_game_user_log
-//     WHERE id_user = ? AND Id_Game = ? AND status = ? AND ID_ORGANIZATION = ?
-//     ORDER BY score DESC;
-//   `;
-
-//   // Execute the SQL query with the provided parameters
-//   db2.query(
-//     query,
-//     [Id_Game, status, ID_ORGANIZATION, id_user, Id_Game, status, ID_ORGANIZATION],
-//     (err, result) => {
-//       if (err) {
-//         console.error('Error fetching scores:', err);
-//         res.status(500).json({ error: 'Failed to fetch scores' });
-//         return;
-//       }
-//       res.status(200).json({ scores: result });
-//     }
-//   );
-// });
-
-
-
-// app.get('/api/leaderboard', (req, res) => {
-//   const { id_game, ID_ORGANIZATION } = req.query; // Assuming the client will send these values as query parameters
-
-//   // Construct the SQL SELECT query to fetch leaderboard data
-//   const mainQuery = `
-//     SELECT id_user, score,
-//            @row_number := @row_number + 1 AS ranking
-//     FROM (
-//         SELECT id_user, SUM(score) AS score
-//         FROM tbl_game_user_log 
-//         WHERE id_game = ? AND ID_ORGANIZATION = ?
-//         GROUP BY id_user
-//         ORDER BY score DESC
-//     ) AS ranked_users;
-//   `;
-
-//   // Execute the SET statement to initialize the row number variable
-//   db.query('SET @row_number = 0;', (err) => {
-//     if (err) {
-//       console.error('Error initializing row number variable:', err);
-//       res.status(500).json({ error: 'Failed to fetch leaderboard data' });
-//       return;
-//     }
-
-//     // Execute the main query after setting the variable
-//     db2.query(mainQuery, [id_game, ID_ORGANIZATION], (err, result) => {
-//       if (err) {
-//         console.error('Error fetching leaderboard data:', err);
-//         res.status(500).json({ error: 'Failed to fetch leaderboard data' });
-//         return;
-//       }
-//       res.status(200).json({ leaderboard: result });
-//     });
-//   });
-// });
-
-
-
-///////////////////////////////////////////////Leaderboard////////////////////////////////////////
-// app.get('/api/leaderboard', (req, res) => {
-//   const { id_game, ID_ORGANIZATION } = req.query; // Assuming the client will send these values as query parameters
-
-//   // Construct the SQL SELECT query to fetch leaderboard data
-//   const mainQuery = `
-//     SELECT id_user, score,
-//            @row_number := IF(@prev_score = score, @row_number, @row_number + 1) AS ranking,
-//            @prev_score := score
-//     FROM (
-//         SELECT id_user, SUM(score) AS score
-//         FROM tbl_game_user_log 
-//         WHERE id_game = ? AND ID_ORGANIZATION = ?
-//         GROUP BY id_user
-//         ORDER BY score DESC
-//     ) AS g,
-//     (SELECT @row_number := 0, @prev_score := NULL) AS r;
-//   `;
-
-//   // Execute the main query
-//   db2.query(mainQuery, [id_game, ID_ORGANIZATION], (err, result) => {
-//     if (err) {
-//       console.error('Error fetching leaderboard data:', err);
-//       res.status(500).json({ error: 'Failed to fetch leaderboard data' });
-//       return;
-//     }
-//     res.status(200).json({ leaderboard: result });
-//   });
-// });
-
 
 app.get('/api/leaderboard', (req, res) => {
   const { id_game, ID_ORGANIZATION } = req.query; // Assuming the client will send these values as query parameters
@@ -689,18 +426,26 @@ app.get('/api/overallleaderboard', (req, res) => {
 
   // Construct the SQL SELECT query to fetch leaderboard data
   const queryLeaderboard = `
-    SELECT id_user, total_score,
-           @rank := IF(@prev_score = total_score, @rank, @rank + @prev := 1) AS rank,
-           @prev_score := total_score
+    SELECT 
+        g.id_user,
+        g.total_score,
+        g.high_rank,
+        g.low_rank
     FROM (
-        SELECT id_user, SUM(score) AS total_score
-        FROM tbl_game_user_log 
-        WHERE ID_ORGANIZATION = ?
-        GROUP BY id_user
-        ORDER BY total_score DESC
-    ) AS g,
-    (SELECT @rank := 0, @prev := 0, @prev_score := NULL) AS r
-    ORDER BY total_score DESC;
+        SELECT 
+            id_user, 
+            SUM(score) AS total_score,
+            DENSE_RANK() OVER (ORDER BY SUM(score) DESC) AS high_rank,
+            DENSE_RANK() OVER (ORDER BY SUM(score) ASC) AS low_rank
+        FROM 
+            tbl_game_user_log 
+        WHERE 
+            ID_ORGANIZATION = ?
+        GROUP BY 
+            id_user
+    ) AS g
+    ORDER BY 
+        g.total_score DESC;
   `;
 
   // Execute the SQL query to fetch leaderboard data
@@ -737,7 +482,8 @@ app.get('/api/overallleaderboard', (req, res) => {
           name: userDetails ? userDetails.Name : null,
           email: userDetails ? userDetails.Email : null,
           total_score: leaderboardEntry.total_score,
-          rank: leaderboardEntry.rank
+          high_rank: leaderboardEntry.high_rank,
+          low_rank: leaderboardEntry.low_rank
         };
       });
 
@@ -771,131 +517,6 @@ app.get('/api/overallleaderboard', (req, res) => {
   });
 });
 
-// app.get('/api/overallleaderboard', (req, res) => {
-//   const { ID_ORGANIZATION } = req.query;
-
-//   // Construct the SQL SELECT query to fetch leaderboard data
-//   const queryLeaderboard = `
-//     SELECT id_user, total_score,
-//            @rank := IF(@prev_score = total_score, @rank, @rank + @prev := 1) AS rank,
-//            @prev_score := total_score
-//     FROM (
-//         SELECT id_user, SUM(score) AS total_score
-//         FROM tbl_game_user_log 
-//         WHERE ID_ORGANIZATION = ?
-//         GROUP BY id_user
-//         ORDER BY total_score DESC
-//     ) AS g,
-//     (SELECT @rank := 0, @prev := 0, @prev_score := NULL) AS r
-//     ORDER BY total_score DESC;
-//   `;
-
-//   // Execute the SQL query to fetch leaderboard data
-//   db2.query(queryLeaderboard, [ID_ORGANIZATION], (err, leaderboardResult) => {
-//     if (err) {
-//       console.error('Error fetching leaderboard data:', err);
-//       res.status(500).json({ error: 'Failed to fetch leaderboard data' });
-//       return;
-//     }
-
-//     // Extract user ids from the leaderboard results
-//     const userIds = leaderboardResult.map(entry => entry.id_user);
-
-//     // Construct the SQL SELECT query to fetch user details
-//     const queryUserDetails = `
-//       SELECT Id_User, Name, Email
-//       FROM tbl_users
-//       WHERE ID_ORGANIZATION = ? AND Id_User IN (?)
-//     `;
-
-//     // Execute the SQL query to fetch user details
-//     db2.query(queryUserDetails, [ID_ORGANIZATION, userIds], (err, userDetailsResult) => {
-//       if (err) {
-//         console.error('Error fetching user details:', err);
-//         res.status(500).json({ error: 'Failed to fetch user details' });
-//         return;
-//       }
-
-//       // Combine leaderboard data with user details
-//       const combinedResult = leaderboardResult.map(leaderboardEntry => {
-//         const userDetails = userDetailsResult.find(user => user.Id_User === leaderboardEntry.id_user);
-//         return {
-//           id_user: leaderboardEntry.id_user,
-//           name: userDetails ? userDetails.Name : null,
-//           email: userDetails ? userDetails.Email : null,
-//           total_score: leaderboardEntry.total_score,
-//           rank: leaderboardEntry.rank
-//         };
-//       });
-
-//       res.status(200).json({ leaderboard: combinedResult });
-//     });
-//   });
-// });
-
-
-
-
-// app.get('/api/overallleaderboard', (req, res) => {
-//   const { ID_ORGANIZATION } = req.query;
-
-//   // Construct the SQL SELECT query to fetch leaderboard data
-//   const query = `
-//     SELECT id_user, total_score,
-//            @rank := IF(@prev_score = total_score, @rank, @rank + @prev := 1) AS rank,
-//            @prev_score := total_score
-//     FROM (
-//         SELECT id_user, SUM(score) AS total_score
-//         FROM tbl_game_user_log 
-//         WHERE ID_ORGANIZATION = ?
-//         GROUP BY id_user
-//         ORDER BY total_score DESC
-//     ) AS g,
-//     (SELECT @rank := 0, @prev := 0, @prev_score := NULL) AS r
-//     ORDER BY total_score DESC;
-//   `;
-
-//   // Execute the SQL query
-//   db2.query(query, [ID_ORGANIZATION], (err, result) => {
-//     if (err) {
-//       console.error('Error fetching leaderboard data:', err);
-//       res.status(500).json({ error: 'Failed to fetch leaderboard data' });
-//       return;
-//     }
-//     res.status(200).json({ leaderboard: result });
-//   });
-// });
-
-
-
-// app.get('/api/userInfo', (req, res) => {
-//   const { id_user, id_game, id_organization } = req.query; // Assuming the client will send these values as query parameters
-
-//   // Construct the SQL SELECT query to retrieve user information
-//   const query = `
-//     SELECT tbl_users.Email, tbl_users.ID_ORGANIZATION
-//     FROM tbl_users
-//     JOIN tbl_game_user_log ON tbl_users.Id_User = tbl_game_user_log.id_user
-//     WHERE tbl_game_user_log.id_user = ? AND tbl_game_user_log.Id_Game = ? AND tbl_game_user_log.ID_ORGANIZATION = ?
-//     LIMIT 1;
-//   `;
-
-//   // Execute the SQL query with the provided parameters
-//   db2.query(query, [id_user, id_game, id_organization], (err, result) => {
-//     if (err) {
-//       console.error('Error fetching user information:', err);
-//       res.status(500).json({ error: 'Failed to fetch user information' });
-//       return;
-//     }
-//     if (result.length > 0) {
-//       // User found, return user information
-//       res.status(200).json({ email: result[0].Email, organization: result[0].ID_ORGANIZATION });
-//     } else {
-//       // User not found
-//       res.status(404).json({ error: 'User not found' });
-//     }
-//   });
-// });
 
 app.get('/api/userInfo', (req, res) => {
   const { id_user, id_game, id_organization } = req.query; // Assuming the client will send these values as query parameters
@@ -1005,155 +626,6 @@ app.post('/api/coinsGameLog', (req, res) => {
     res.status(200).json({ message: 'Data inserted successfully into tbl_coins_game_log' });
   });
 });
-// Define the GET API endpoint to retrieve data from tbl_coins_game_log
-// app.get('/api/coins-game-log', (req, res) => {
-//   // Extract org_id and id_game from query parameters
-//   const { org_id, id_game } = req.query;
-
-//   // Construct the SQL SELECT query to retrieve data and rank
-//   const query = `
-//     SELECT *, 
-//            @rank := IF(@prev_xps = xps, @rank, @rank + 1) AS rank,
-//            @prev_xps := xps
-//     FROM (
-//         SELECT id_user, SUM(xps) AS xps
-//         FROM tbl_coins_game_log
-//         WHERE org_id = ? AND id_game = ?
-//         GROUP BY id_user
-//         ORDER BY xps DESC
-//     ) AS ranked_data,
-//     (SELECT @rank := 0, @prev_xps := NULL) AS r;
-//   `;
-
-//   // Execute the SQL query with the provided parameters
-//   db.query(query, [org_id, id_game], (err, result) => {
-//     if (err) {
-//       console.error('Error retrieving data:', err);
-//       res.status(500).json({ error: 'Failed to retrieve data' });
-//       return;
-//     }
-
-//     // Process the retrieved data to calculate rank and sum xps for same id_user
-//     let rank = 0;
-//     let prevXps = null;
-//     result.forEach((row, index) => {
-//       if (row.xps !== prevXps) {
-//         rank++;
-//         prevXps = row.xps;
-//       }
-//       row.rank = rank;
-//     });
-
-//     res.status(200).json({ data: result });
-//   });
-// });
-
-
-
-
-// app.get('/api/coins-game-log', (req, res) => {
-//   const { org_id, id_game } = req.query;
-
-//   // Construct the SQL SELECT query to fetch game scores data
-//   const queryGameScores = `
-//     SELECT id_user, id_game, SUM(xps) AS total_xps
-//     FROM tbl_coins_game_log
-//     WHERE org_id = ? and id_game = ?
-//     GROUP BY id_user, id_game;
-//   `;
-
-//   // Execute the SQL query to fetch game scores data
-//   db.query(queryGameScores, [org_id, id_game], (err, gameScoresResult) => {
-//     if (err) {
-//       console.error('Error fetching game scores data:', err);
-//       res.status(500).json({ error: 'Failed to fetch game scores data' });
-//       return;
-//     }
-
-//     // Aggregate total xps for each id_user
-//     const aggregatedScores = {};
-//     gameScoresResult.forEach(scoreEntry => {
-//       const { id_user, total_xps } = scoreEntry;
-//       if (aggregatedScores[id_user]) {
-//         aggregatedScores[id_user] += total_xps;
-//       } else {
-//         aggregatedScores[id_user] = total_xps;
-//       }
-//     });
-
-//     // Extract unique id_users
-//     const uniqueIdUsers = Object.keys(aggregatedScores);
-
-//     // Construct the SQL SELECT query to fetch user details
-//     const queryUserDetails = `
-//       SELECT Id_User, Name, Email
-//       FROM tbl_users
-//       WHERE Id_User IN (${uniqueIdUsers.map(() => '?').join(',')});
-//     `;
-
-//     // Execute the SQL query to fetch user details
-//     db2.query(queryUserDetails, uniqueIdUsers, (err, userDetailsResult) => {
-//       if (err) {
-//         console.error('Error fetching user details:', err);
-//         res.status(500).json({ error: 'Failed to fetch user details' });
-//         return;
-//       }
-
-//       // Format the result with user details
-//       const formattedResults = userDetailsResult.map(user => ({
-//         id_user: user.Id_User,
-//         name: user.Name,
-//         email: user.Email,
-//         total_xps: aggregatedScores[user.Id_User]
-//       }));
-
-//       // Sort formattedResults by total_xps in descending order
-//       formattedResults.sort((a, b) => b.total_xps - a.total_xps);
-
-//       // Extract unique name and email combinations
-//       const uniqueNameEmails = userDetailsResult.map(user => ({
-//         name: user.Name,
-//         email: user.Email
-//       }));
-
-//       // Construct the SQL SELECT query to fetch city from tbl_temp_user
-//       const queryCity = `
-//         SELECT name, email, city
-//         FROM tbl_temp_user
-//         WHERE org_id = ? AND (name, email) IN (${uniqueNameEmails.map(() => '(?, ?)').join(',')});
-//       `;
-
-//       // Flatten the uniqueNameEmails array to pass as parameters
-//       const flatNameEmails = uniqueNameEmails.reduce((acc, { name, email }) => {
-//         acc.push(name, email);
-//         return acc;
-//       }, []);
-
-//       // Execute the SQL query to fetch city
-//       db.query(queryCity, [org_id, ...flatNameEmails], (err, cityResult) => {
-//         if (err) {
-//           console.error('Error fetching city:', err);
-//           res.status(500).json({ error: 'Failed to fetch city' });
-//           return;
-//         }
-
-//         // Create a map of name and email to city
-//         const cityMap = {};
-//         cityResult.forEach(({ name, email, city }) => {
-//           cityMap[`${name}|${email}`] = city;
-//         });
-
-//         // Update the formatted results with city
-//         formattedResults.forEach(result => {
-//           const { name, email } = result;
-//           result.city = cityMap[`${name}|${email}`] || null;
-//         });
-
-//         res.status(200).json({ game_scores: formattedResults });
-//       });
-//     });
-//   });
-// });
 
 app.get('/api/coins-game-log', (req, res) => {
   const { org_id, id_game } = req.query;
@@ -1276,13 +748,6 @@ app.get('/api/coins-game-log', (req, res) => {
 
 
 
-
-
-
-
-
-
-
 app.get('/api/overallxps', (req, res) => {
   const { org_id } = req.query;
 
@@ -1389,36 +854,6 @@ app.get('/api/overallxps', (req, res) => {
 
 
 
-
-
-
-
-// Define the endpoint to send OTP
-// app.get('/api/send-otp', async (req, res) => {
-//   console.log(req);
-//   try {
-//     // Extract query parameters from the request URL
-//     const { template_id, mobile, authkey } = req.body;
-//     console.log(req.body);
-//     // Make a request to the MSG91 OTP API
-//     const response = await axios.get('https://control.msg91.com/api/v5/otp', {
-//       params: {
-//         template_id,
-//         mobile,
-//         authkey
-//       }
-
-//     });
-//     // Send back the response from the MSG91 API
-//     res.json(response.data);
-//   } catch (error) {
-//     // Handle errors
-//     console.error('Error:', error.response.data);
-//     res.status(500).json({ error: 'Internal Server Error' });
-//   }
-// });
-
-
 app.post('/api/send-otp', async (req, res) => {
   try {
     // Extract data from the request body
@@ -1439,29 +874,6 @@ app.post('/api/send-otp', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
-
-// app.get('/api/verify-otp', async (req, res) => {
-//   try {
-//     const otp = req.query.otp;
-//     const mobile = req.query.mobile;
-//     const authkey = req.headers['authkey'];
-
-//     // Make a request to the MSG91 OTP verification API
-//     const response = await axios.get(`https://control.msg91.com/api/v5/otp/verify?otp=${otp}&mobile=${mobile}`, {
-//       headers: {
-//         'authkey': authkey
-//       }
-//     });
-
-//     // Send back the response from the MSG91 API
-//     res.json(response.data);
-//   } catch (error) {
-//     // Handle errors
-//     console.error('Error:', error.response.data);
-//     res.status(500).json({ error: 'Internal Server Error' });
-//   }
-// });
-
 
 
 
@@ -1587,38 +999,6 @@ app.post("/api/insertGamePlayedStatus", (req, res) => {
   });
 });
 
-
-// app.post("/api/insertGamePlayedStatus", (req, res) => {
-//   const { id_game, id_user, org_id, play_status } = req.body;
-
-//   // Set default play_status if not provided
-//   const playStatusValue = play_status !== undefined ? play_status : 0;
-
-//   // Create a timestamp for updated_datetime
-//   const updatedDateTime = new Date().toISOString().slice(0, 19).replace('T', ' ');
-
-//   // Construct the SQL INSERT query
-//   const query = `
-//     INSERT INTO game_played_status (id_game, id_user, org_id, play_status, updated_datetime)
-//     VALUES (?, ?, ?, ?, ?)
-//   `;
-
-//   // Execute the SQL query with the provided values
-//   db.query(
-//     query,
-//     [id_game, id_user, org_id, playStatusValue, updatedDateTime],
-//     (err, result) => {
-//       if (err) {
-//         console.error("Error inserting game played status:", err);
-//         res.status(500).json({ error: "Failed to insert game played status" });
-//         return;
-//       }
-//       console.log("Game played status inserted successfully");
-//       res.status(200).json({ message: "Game played status inserted successfully" });
-//     }
-//   );
-// });
-
 app.get("/api/getGamePlayedStatus/:id_user/:org_id", (req, res) => {
   const { id_user, org_id } = req.params;
 
@@ -1653,7 +1033,7 @@ app.get("/api/getGamePlayedStatus/:id_user/:org_id", (req, res) => {
 // Endpoint to get ngage_logo and dashboard_logo by id_ngage_Organization
 app.get('/organization/logos/:id', (req, res) => {
   const id = req.params.id;
-  const sql = 'SELECT ngage_logo, dashboard_logo FROM tbl_sub_organizations WHERE sub_org_id = ?';
+  const sql = 'SELECT ngage_logo, dashboard_logo,background_image FROM tbl_sub_organizations WHERE sub_org_id = ?';
   
   // Execute SQL query
   db.query(sql, [id], (err, results) => {
@@ -1671,15 +1051,53 @@ app.get('/organization/logos/:id', (req, res) => {
     // Return the logos
     const logos = {
       ngage_logo: results[0].ngage_logo,
-      dashboard_logo: results[0].dashboard_logo
+      dashboard_logo: results[0].dashboard_logo,
+      background_image: results[0].background_image
     };
     res.json(logos);
   });
 });
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+
+
+// API endpoint to check if phone number exists for a given org_id
+app.get('/checkPhoneNumber', (req, res) => {
+  // Extract org_id and phone_number from request query
+  const org_id = req.query.org_id;
+  const phone_number = req.query.phone_number;
+
+  // SQL query to check if the phone number exists for the given org_id
+  const sql = 'SELECT COUNT(*) AS count FROM tbl_temp_user WHERE org_id = ? AND phone_number = ?';
+
+  // Execute the query
+  db.query(sql, [org_id, phone_number], (error, results) => {
+    if (error) {
+      // Error occurred during query execution
+      return res.status(500).json({ error: 'Internal server error' });
+    }
+
+    // Extract the count from the result
+    const count = results[0].count;
+
+    // Check if the phone number exists for the given org_id
+    if (count > 0) {
+      return res.json({ exists: true });
+    } else {
+      return res.json({ exists: false });
+    }
+  });
 });
 
-// const server = https.createServer(httpsOptions,app).listen(8080, () => {
-//   console.log("Server running on https://localhost:8080/");
+
+
+//console.log(sum);
+// app.listen(port, () => {
+//   console.log(`Server is running on port ${port}`);
 // });
+
+const server = https.createServer(httpsOptions, app).listen(4000, () => {
+  console.log("Server running on https://localhost:4000/");
+});
+
+
+
+  
